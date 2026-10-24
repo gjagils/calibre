@@ -1,0 +1,28 @@
+name: Dependabot auto-merge
+
+# Kleine Calibre-updates (minor/patch) direct mergen en uitrollen; major blijft een PR voor de mens.
+on: pull_request
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: write
+
+jobs:
+  automerge:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.user.login == 'dependabot[bot]'
+    steps:
+      - name: Dependabot metadata
+        id: meta
+        uses: dependabot/fetch-metadata@v2
+
+      - name: Merge en deploy
+        if: steps.meta.outputs.update-type != 'version-update:semver-major'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+        run: |
+          gh pr merge --squash "$PR_URL"
+          # Een merge met GITHUB_TOKEN start geen push-workflow, dus deploy expliciet starten
+          gh workflow run deploy.yml --repo "$GITHUB_REPOSITORY" --ref main
