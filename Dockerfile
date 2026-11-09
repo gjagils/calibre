@@ -1,2 +1,2 @@
 # Calibre (linuxserver) zonder aanpassingen; eigen image zodat versies via Dependabot lopen.
-FROM ghcr.io/linuxserver/calibre:9.17.0
+FROM ghcr.io/linuxserver/calibre:9.18.0
